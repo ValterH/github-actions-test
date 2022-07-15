@@ -11,12 +11,11 @@ jobs:
       - uses: actions/checkout@v2
 
       - id: read-version
-          run: |
-            echo "::set-output name=version::$(jq -r ".version" package.json)"
-            
+        run: |
+          echo "::set-output name=version::$(jq -r ".version" package.json)"
+
       - id: changelog-enforcer
         uses: dangoslen/changelog-enforcer@v3
         with:
-          skipLabels: "skip-changelog"
           versionPattern: '## \[(\d*\.\d*\.\d*)\]'
-          expectedLatestVersion: ${{ steps.read-version.outputs.tag }}
+          expectedLatestVersion: ${{ steps.read-version.outputs.version }}
