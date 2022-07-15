@@ -1,0 +1,21 @@
+name: "Changelog Enforcer"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dangoslen/changelog-enforcer@v3
+    - id: read-version
+        run: |
+          echo "::set-output name=version::$(jq -r ".version" package.json)"
+      - id: changelog-enforcer
+        uses: ./
+        with:
+          skipLabels: "skip-changelog"
+          versionPattern: '## \[(\d*\.\d*\.\d*)\]'
+          expectedLatestVersion: ${{ steps.read-version.outputs.tag }}
