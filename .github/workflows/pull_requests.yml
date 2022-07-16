@@ -12,4 +12,4 @@ jobs:
     - name: Pull request body validation
       uses: ValterH/pull-request-validation@v1
       with:
-        regex: '.* What this PR does \/ why we need it:\n*.+\n+.*Which issue\(s\) this PR fixes:\n*Fixes \d'
+        regex: '/.* What this PR does \/ why we need it:\n*.+\n+.*Which issue\(s\) this PR fixes:\n*Fixes \d/gmi'
