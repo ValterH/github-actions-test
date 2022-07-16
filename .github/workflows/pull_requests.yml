@@ -1,17 +1,15 @@
-name: Pull Format Check
+name: PR Format Check
 on: [pull_request]
 jobs:
   example:
-    name: Example job
+    name: Pull request format check
     runs-on: ubuntu-latest
     steps:
     - name: Run actions/checkout 
       uses: actions/checkout@v1
       with:
         fetch-depth: 1
-    - name: Run fabiankoestring/body-regex-validator-action
-      uses: fabiankoestring/body-regex-validator-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PULL_REQUEST_PATTERN: '.* What this PR does \/ why we need it:\n*.+\n+.*Which issue\(s\) this PR fixes:\n*Fixes \d'
-        PULL_REQUEST_COMMENT: 'This is my pr comment template.'
+    - name: Pull request body validation
+      uses: ValterH/pull-request-validation@v1
+      with:
+        regex: '.* What this PR does \/ why we need it:\n*.+\n+.*Which issue\(s\) this PR fixes:\n*Fixes \d'
