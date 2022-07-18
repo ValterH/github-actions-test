@@ -16,7 +16,7 @@ jobs:
         with:
           title-pattern: '^(Feature|Bug): (Add|Remove|Update) .*$'
 
-      -id: triage-action
+      - id: triage-action
         uses: Logerfo/triage-action@0.0.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
