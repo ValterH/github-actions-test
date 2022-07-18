@@ -6,19 +6,19 @@ on:
   project_card:
     types: [created, deleted]
   jobs:
-  issue-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
+    issue-check:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
 
-      - id: issue-title-check
-        uses: ValterH/github-actions-test@v1
-        with:
-          title-pattern: '^(Feature|Bug): (Add|Remove|Update) .*$'
+        - id: issue-title-check
+          uses: ValterH/issue-validation@v1
+          with:
+            title-pattern: '^(Feature|Bug): (Add|Remove|Update) .*$'
 
-      -id: triage-action
-        uses: Logerfo/triage-action@0.0.2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          label: triage # The triage label of your repository.
-          project: true # Enable or disable the idea that adding an issue to a project drops its triage state.
+        -id: triage-action
+          uses: Logerfo/triage-action@0.0.2
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            label: triage # The triage label of your repository.
+            project: true # Enable or disable the idea that adding an issue to a project drops its triage state.
