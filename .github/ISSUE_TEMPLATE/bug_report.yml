@@ -26,11 +26,11 @@ body:
       required: true
 
   - type: textarea
-    id: additional
+    id: suggestions
     attributes:
-      label: Add any other context about the problem here.
+      label: Do you have a proposed solution, describe it here.
 
   - type: textarea
-    id: screenshots
+    id: additional
     attributes:
-      label: If applicable, add screenshots to help explain your problem.
+      label: Additional context and screenshots.
