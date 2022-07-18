@@ -14,6 +14,7 @@ jobs:
       - id: issue-title-check
         uses: ValterH/issue-validation@v1
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           title-pattern: '^(Feature|Bug): (Add|Remove|Update) .*$'
 
       - id: triage-action
