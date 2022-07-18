@@ -22,8 +22,6 @@ body:
     id: alternatives
     attributes:
       label: Describe alternatives you've considered
-    validations:
-      required: true
 
   - type: textarea
     id: additional
