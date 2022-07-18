@@ -1,7 +1,7 @@
 name: "Issue Check"
 
 on:
-  issue:
+  issues:
     types: [opened]
   project_card:
     types: [created, deleted]
