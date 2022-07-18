@@ -2,7 +2,7 @@ name: "Issue Check"
 
 on:
   issues:
-    types: [opened]
+    types: [opened, edited]
   project_card:
     types: [created, deleted]
 jobs:
