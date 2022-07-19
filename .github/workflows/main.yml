@@ -15,30 +15,20 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm audit --audit-level=moderate
-      - run: npm run lint
-      - run: npm run test
-      - run: npm run coverage
-  
-  # test:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: 16
-  #         registry-url: https://registry.npmjs.org/
-  #     - run: npm run test
-
-  # coverage:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: 16
-  #         registry-url: https://registry.npmjs.org/
-  #     - run: npm run coverage
+      - name: Restore npm cache
+        uses: actions/cache@v2
+        with:
+          path: '~/.npm'
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install packages
+        run: npm ci
+      - name: Audit packages
+        run: npm audit --audit-level=moderate
+      - name: Lint the code
+        run: npm run lint
+      - name: Run tests
+        run: npm run test
+      - name: Run coverage
+        run: npm run coverage
