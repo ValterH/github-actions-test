@@ -1,0 +1,6 @@
+bug:
+    - 'bug'
+enhancement:
+    - 'feature'
+blocking:
+    - 'blocking'

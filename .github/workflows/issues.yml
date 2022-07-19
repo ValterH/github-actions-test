@@ -11,15 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - id: issue-title-check
-        uses: ValterH/issue-validation@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          title-pattern: '^(Feature|Bug): (Add|Remove|Update) .*$'
-
       - id: triage-action
         uses: Logerfo/triage-action@0.0.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           label: triage # The triage label of your repository.
           project: true # Enable or disable the idea that adding an issue to a project drops its triage state.
+      
+      - id: issue-labeler
+        uses: github/issue-labeler@v2.0
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          configuration-path: .github/labeler.yml
+          enable-versioned-regex: 0
