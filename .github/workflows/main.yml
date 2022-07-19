@@ -22,9 +22,19 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - run: npm run test
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - run: npm run test
 
   coverage:
     runs-on: ubuntu-latest
     steps:
-    - run: npm run coverage
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - run: npm run coverage
