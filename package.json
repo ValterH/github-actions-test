@@ -2,8 +2,46 @@
   "name": "github-actions-test",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
+  "scripts": {
+    "lint": "./node_modules/.bin/eslint . --fix",
+    "test": "./node_modules/.bin/jest test --no-cache --runInBand",
+    "coverage": "./node_modules/.bin/jest --coverage --no-cache --runInBand"
+  },
   "main": "index.js",
   "dependencies": {
     "fastify": "^4.2.1"
+  },
+  "devDependencies": {
+    "eslint": "8.17.0",
+    "jest": "28.1.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "ignorePatterns": [
+      "node_modules/",
+      "coverage/"
+    ],
+    "env": {
+      "node": true,
+      "jest": true,
+      "es2020": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2020
+    },
+    "rules": {
+      "no-underscore-dangle": [
+        "error",
+        {
+          "allow": [
+            "_id",
+            "_ids"
+          ]
+        }
+      ],
+      "object-curly-newline": "off",
+      "max-len": "off"
+    }
   }
 }

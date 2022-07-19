@@ -15,4 +15,10 @@ const start = async () => {
     process.exit(1)
   }
 }
+
+module.exports = {
+  fastify: fastify,
+  start: start
+};
+
 start()
