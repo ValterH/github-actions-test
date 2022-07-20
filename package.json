@@ -43,5 +43,12 @@
       "object-curly-newline": "off",
       "max-len": "off"
     }
+  },
+  "jest": {
+    "coverageThreshold": {
+      "global": {
+        "lines": 50
+      }
+    }
   }
 }
