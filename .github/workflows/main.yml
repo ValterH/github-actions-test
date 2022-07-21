@@ -29,6 +29,7 @@ jobs:
       - name: Lint the code
         run: npm run lint
   test:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -46,6 +47,7 @@ jobs:
       - name: Run tests
         run: npm run test
   coverage:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
