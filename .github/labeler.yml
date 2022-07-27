@@ -4,3 +4,6 @@ enhancement:
     - 'feature'
 blocking:
     - 'blocking'
+
+triage:
+    - '[] triaged'
