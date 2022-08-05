@@ -26,7 +26,7 @@ jobs:
           echo "$VERSION"
       - name: Check tag version match in CHANGELOG.md
         run: |
-          VERSION = ${{ env.VERSION }}
+          VERSION=${{ env.VERSION }}
           if grep '\[$VERSION\]' CHANGELOG.md;
           then
             echo VERSION = $VERSION
