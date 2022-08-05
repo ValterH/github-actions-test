@@ -28,7 +28,9 @@ jobs:
         run: |
           VERSION=$(npm run env | grep npm_package_version | cut -d '=' -f 2)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-      
+      - id: echo-version
+        run: |
+          echo $VERSION
       - name: Check tag version match in CHANGELOG.md
         run: |
           if grep -q '\[$VERSION\]' CHANGELOG.md;
