@@ -50,6 +50,7 @@ jobs:
       - name: Check tag name and version match
         run: |
           if ${{github.ref_type == 'tag'}};
+            then
             # Check for package.json and tag value mismatch
             if ${{ github.ref_name != env.VERSION }}
             then
