@@ -27,7 +27,7 @@ jobs:
       - name: Check version in CHANGELOG.md
         run: |
           VERSION=${{ env.VERSION }}
-          if grep -q '\[$VERSION\]' CHANGELOG.md;
+          if ! grep -q "\[$VERSION\]" CHANGELOG.md;
           then
             echo VERSION = $VERSION
             echo 'package.json version does not have matching entry in CHANGELOG.md' 
@@ -41,7 +41,7 @@ jobs:
             TAG_NAME=${{ github.ref_name }}
             cat CHANGELOG.md
             echo "\[$TAG_NAME\] - [^Uu ]"
-            if grep -q '\[$TAG_NAME\] - [^Uu ]' CHANGELOG.md;
+            if ! grep -q "\[$TAG_NAME\] - [^Uu ]" CHANGELOG.md;
             then
               echo TAG NAME = $TAG_NAME
               echo 'Tag name does not match a released version or is missing release date in CHANGELOG.md entry' 
