@@ -19,18 +19,19 @@ jobs:
           node-version: [16.x]
     steps:
       - uses: actions/checkout@v2
-      - name: Check tag version match in CHANGELOG.md
+      - name: Set version
         run: |
           VERSION=$(npm run env | grep npm_package_version | cut -d '=' -f 2)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-    
+          echo "$VERSION"
+      - name: Check tag version match in CHANGELOG.md
+        run: |
+          VERSION = ${{ env.VERSION }}
           if grep '\[$VERSION\]' CHANGELOG.md;
           then
             echo VERSION = $VERSION
             echo 'package.json version does not have matching entry in CHANGELOG.md' 
             exit 1;
-          else:
-            echo "VERSION = $VERSION"
           fi
           
           if ${{github.ref_type == 'tag'}};
@@ -42,13 +43,13 @@ jobs:
               echo TAG NAME = $TAG_NAME
               echo 'Tag name does not match a released version or is missing release date in CHANGELOG.md entry' 
               exit 1;
-            else:
-              echo "TAG NAME = $TAG_NAME"
             fi
             
             # Check for package.json and tag value mismatch
-            if [[ $TAG_NAME != $VERSION ]]
+            if ${{ github.ref_name != env.VERSION }}
             then
+              echo ${{ github.ref_name }}
+              echo ${{ env.VERSION }}
               echo 'Tag name does not match a version value from package.json' 
               exit 1;
             fi
