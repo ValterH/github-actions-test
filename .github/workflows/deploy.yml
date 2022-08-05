@@ -19,11 +19,6 @@ jobs:
           node-version: [16.x]
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
       - name: Check tag version match in CHANGELOG.md
         run: |
           VERSION=$(npm run env | grep npm_package_version | cut -d '=' -f 2)
@@ -31,8 +26,6 @@ jobs:
     
           if grep '\[$VERSION\]' CHANGELOG.md;
           then
-            echo VERSION = $VERSION
-          else
             echo VERSION = $VERSION
             echo 'package.json version does not have matching entry in CHANGELOG.md' 
             exit 1;
@@ -44,8 +37,6 @@ jobs:
 
             if grep -q '\[$TAG_NAME\] - \[^Uu \]' CHANGELOG.md;
             then
-              echo TAG NAME = $TAG_NAME
-            else:
               echo TAG NAME = $TAG_NAME
               echo 'Tag name does not match a released version or is missing release date in CHANGELOG.md entry' 
               exit 1;
