@@ -43,7 +43,7 @@ jobs:
             fi
             
             # Check for package.json and tag value mismatch
-            if $TAG_NAME != $VERSION
+            if [[ $TAG_NAME != $VERSION ]]
             then
               echo 'Tag name does not match a version value from package.json' 
               exit 1;
