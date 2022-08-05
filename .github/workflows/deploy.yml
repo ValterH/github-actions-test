@@ -41,6 +41,7 @@ jobs:
             TAG_NAME=${{ github.ref_name }}
             cat CHANGELOG.md
             echo "\[$TAG_NAME\] - \[^Uu \]"
+            echo | grep '\[$TAG_NAME\] - \[^Uu \]' CHANGELOG.md;
             if grep '\[$TAG_NAME\] - \[^Uu \]' CHANGELOG.md;
             then
               echo TAG NAME = $TAG_NAME
