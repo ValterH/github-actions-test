@@ -31,9 +31,9 @@ jobs:
     
           if grep -q '\[$VERSION\]' CHANGELOG.md;
           then
-            echo $VERSION
+            echo VERSION = $VERSION
           else
-            echo $VERSION
+            echo VERSION = $VERSION
             echo 'package.json version does not have matching entry in CHANGELOG.md' 
             exit 1;
           fi
@@ -44,6 +44,9 @@ jobs:
 
             if grep -q '\[$TAG_NAME\] - \[^Uu \]' CHANGELOG.md;
             then
+              echo TAG NAME = $TAG_NAME
+            else:
+              echo TAG NAME = $TAG_NAME
               echo 'Tag name does not match a released version or is missing release date in CHANGELOG.md entry' 
               exit 1;
             fi
