@@ -40,7 +40,7 @@ jobs:
           then
             TAG_NAME=${{ github.ref_name }}
 
-            if grep -q '\[$TAG_NAME\] - \[^Uu \]' CHANGELOG.md;
+            if grep '\[$TAG_NAME\] - \[^Uu \]' CHANGELOG.md;
             then
               echo TAG NAME = $TAG_NAME
               echo 'Tag name does not match a released version or is missing release date in CHANGELOG.md entry' 
