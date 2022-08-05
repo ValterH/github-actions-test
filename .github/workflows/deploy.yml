@@ -24,7 +24,7 @@ jobs:
           VERSION=$(npm run env | grep npm_package_version | cut -d '=' -f 2)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "$VERSION"
-      - name: Check tag version match in CHANGELOG.md
+      - name: Check version in CHANGELOG.md
         run: |
           VERSION=${{ env.VERSION }}
           if grep '\[$VERSION\]' CHANGELOG.md;
@@ -33,7 +33,9 @@ jobs:
             echo 'package.json version does not have matching entry in CHANGELOG.md' 
             exit 1;
           fi
-          
+      - name: Check tag version in CHANGELOG.md
+        run: |
+          VERSION=${{ env.VERSION }}
           if ${{github.ref_type == 'tag'}};
           then
             TAG_NAME=${{ github.ref_name }}
@@ -44,7 +46,10 @@ jobs:
               echo 'Tag name does not match a released version or is missing release date in CHANGELOG.md entry' 
               exit 1;
             fi
-            
+          fi
+      - name: Check tag name and version match
+        run: |
+          if ${{github.ref_type == 'tag'}};
             # Check for package.json and tag value mismatch
             if ${{ github.ref_name != env.VERSION }}
             then
