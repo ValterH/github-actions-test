@@ -45,6 +45,8 @@ jobs:
             # Check for package.json and tag value mismatch
             if ${{ github.ref_name != env.VERSION }}
             then
+              echo ${{ github.ref_name }}
+              echo ${{ env.VERSION }}
               echo 'Tag name does not match a version value from package.json' 
               exit 1;
             fi
