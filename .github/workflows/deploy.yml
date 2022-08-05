@@ -24,11 +24,13 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - name: Check tag version match in CHANGELOG.md
+      - id: read-version
         run: |
           VERSION=$(npm run env | grep npm_package_version | cut -d '=' -f 2)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-    
+      
+      - name: Check tag version match in CHANGELOG.md
+        run: |
           if grep -q '\[$VERSION\]' CHANGELOG.md;
           then
             echo 'package.json version does not have matching entry in CHANGELOG.md' 
