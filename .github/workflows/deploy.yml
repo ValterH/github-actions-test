@@ -1,0 +1,54 @@
+name: "Deploy build"
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+        - "[0-9]+.[0-9]+.[0-9]+*"
+    workflow_dispatch:
+
+env:
+  NODE_ENV: production
+  VERSION: ''
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+          node-version: [16.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - name: Check tag version match in CHANGELOG.md
+        run: |
+          VERSION=$(npm run env | grep npm_package_version | cut -d '=' -f 2)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+    
+          if grep -q '\[$VERSION\]' CHANGELOG.md;
+          then
+            echo 'package.json version does not have matching entry in CHANGELOG.md' 
+            exit 1;
+          fi
+          
+          if ${{github.ref_type == 'tag'}};
+          then
+            TAG_NAME=${{ github.ref_name }}
+
+            if grep -q '\[$TAG_NAME\] - \[^Uu \]' CHANGELOG.md;
+            then
+              echo 'Tag name does not match a released version or is missing release date in CHANGELOG.md entry' 
+              exit 1;
+            fi
+            
+            # Check for package.json and tag value mismatch
+            if ${{ github.ref_name != env.VERSION }}
+            then
+              echo 'Tag name does not match a version value from package.json' 
+              exit 1;
+            fi
+          fi
