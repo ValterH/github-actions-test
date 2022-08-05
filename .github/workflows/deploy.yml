@@ -31,6 +31,9 @@ jobs:
     
           if grep -q '\[$VERSION\]' CHANGELOG.md;
           then
+            echo $VERSION
+          else
+            echo $VERSION
             echo 'package.json version does not have matching entry in CHANGELOG.md' 
             exit 1;
           fi
