@@ -24,7 +24,7 @@ jobs:
           versionPattern: '## \[(\d*\.\d*\.\d*)\]'
           expectedLatestVersion: ${{ steps.read-version.outputs.version }}
   version:
-    if: event.action == push
+    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
