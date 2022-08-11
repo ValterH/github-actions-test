@@ -1,6 +1,10 @@
 name: "Changelog Enforcer"
 
 on:
+  push:
+    branches: [ main ]
+    tags:
+        - "[0-9]+.[0-9]+.[0-9]+*"
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
 
@@ -19,3 +23,50 @@ jobs:
         with:
           versionPattern: '## \[(\d*\.\d*\.\d*)\]'
           expectedLatestVersion: ${{ steps.read-version.outputs.version }}
+  version:
+    if: event.action == push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set version
+        run: |
+          VERSION=$(npm run env | grep npm_package_version | cut -d '=' -f 2)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "$VERSION"
+      - name: Check version in CHANGELOG.md
+        run: |
+          VERSION=${{ env.VERSION }}
+          if ! grep -q "\[$VERSION\]" CHANGELOG.md;
+          then
+            echo VERSION = $VERSION
+            echo 'package.json version does not have matching entry in CHANGELOG.md' 
+            exit 1;
+          fi
+      - name: Check tag version in CHANGELOG.md
+        run: |
+          VERSION=${{ env.VERSION }}
+          if ${{github.ref_type == 'tag'}};
+          then
+            TAG_NAME=${{ github.ref_name }}
+            cat CHANGELOG.md
+            echo "\[$TAG_NAME\] - [^Uu ]"
+            if ! grep -q "\[$TAG_NAME\] - [^Uu ]" CHANGELOG.md;
+            then
+              echo TAG NAME = $TAG_NAME
+              echo 'Tag name does not match a released version or is missing release date in CHANGELOG.md entry' 
+              exit 1;
+            fi
+          fi
+      - name: Check tag name and version match
+        run: |
+          if ${{github.ref_type == 'tag'}};
+            then
+            # Check for package.json and tag value mismatch
+            if ${{ github.ref_name != env.VERSION }}
+            then
+              echo ${{ github.ref_name }}
+              echo ${{ env.VERSION }}
+              echo 'Tag name does not match a version value from package.json' 
+              exit 1;
+            fi
+          fi
