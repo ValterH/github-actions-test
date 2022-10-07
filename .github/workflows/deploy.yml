@@ -1,0 +1,87 @@
+name: "Deploy build"
+
+on:
+  push:
+    branches: [ main, 'releases/**' ]
+    tags:
+        - "[0-9]+.[0-9]+.[0-9]+*"
+env:
+  NODE_ENV: production
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  REACT_APP_DEPLOY_TARGET: staging
+  REACT_APP_COMMIT_HASH: ''
+  DISTRIBUTION_ID: E3EKR8AT21U2R4
+  VERSION: ''
+  S3_BUCKET: longevize-mylongevize-staging
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+          node-version: [16.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - name: Determine + setup production env
+        run: |
+          VERSION=$(npm run env | grep npm_package_version | cut -d '=' -f 2)
+          # Override VERSION in tagged commits.
+          if ${{ github.ref_type == 'tag' }};
+          # Do not wrap conditions in brackets or quotes here, since bash would evaluate it as a string.
+          then
+            # Set environment for later steps.
+            echo "REACT_APP_DEPLOY_TARGET=production" >> $GITHUB_ENV
+            echo "S3_BUCKET=longevize-mylongevize" >> $GITHUB_ENV
+            echo "DISTRIBUTION_ID=E3LVG11EB856GB" >> $GITHUB_ENV
+            echo 'Production deployment set up'
+          else 
+            echo "REACT_APP_COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          fi
+          echo ${GITHUB_BASE_REF}
+          echo "$AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY ..."
+      - name: Restore npm cache
+        uses: actions/cache@v3
+        with:
+          path: '~/.npm'
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install packages
+        run: npm ci --no-audit
+      - name: Build application
+        run: npm run build
+      # DEVELOPMENT: AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_DEVELOPMENT }}
+      # DEVELOPMENT: AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEVELOPMENT }}
+      - name: AWS authentication
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}         
+          aws-region: eu-central-1
+      # DEVELOPMENT: S3_BUCKET: s3-633551029463-frontend-web-application
+      - name: Clean bucket
+        run: aws s3 rm s3://${{ env.S3_BUCKET }} --recursive    
+      - name: Copy to bucket
+        run: aws s3 cp ./build s3://${{ env.S3_BUCKET }} --recursive 
+      # DEVELOPMENT: DISTRIBUTION_ID:  E25BGCKZ416RLA
+      - name: Invalidate cloudfront cache
+        run: aws cloudfront create-invalidation --distribution-id ${{ env.DISTRIBUTION_ID }} --paths /\*
+      # DEVELOPMENT: REACT_APP_DEPLOY_TARGET: development
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        if: ${{ env.REACT_APP_DEPLOY_TARGET == 'production' }}
+        
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: longevize-bv
+          SENTRY_PROJECT: longevize-pwa
+        with:
+          environment: ${{ env.REACT_APP_DEPLOY_TARGET }}
+          version: ${{ env.VERSION }}
+          sourcemaps: ./build/static/js/ ./build/static/css/
+          set_commits: skip
