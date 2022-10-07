@@ -63,4 +63,7 @@ jobs:
       - name: Check secrets
         run: |
           echo "JUST_SOME_VAR=${{ secrets.AWS_ACCESS_KEY_ID }}_123" >> $GITHUB_ENV
+      - name: Env check
+        run: |
+          echo "$JUST_SOME_VAR"
 
