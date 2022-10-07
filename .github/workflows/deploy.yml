@@ -52,6 +52,8 @@ jobs:
           then
             echo 'Staging deployment set up'
           fi
+          echo ${{ github.ref_name }}
+          echo "$REACT_APP_DEPLOY_TARGET"
       # - name: Restore npm cache
       #   uses: actions/cache@v3
       #   with:
