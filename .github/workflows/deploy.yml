@@ -48,7 +48,7 @@ jobs:
             echo "DISTRIBUTION_ID=E25BGCKZ416RLA" >> $GITHUB_ENV
             echo 'Development deployment set up'
           fi
-          if ${{ github.ref_name == releases.* }};
+          if [[ ${{ github.ref_name  }} == releases.* ]];
           then
             echo 'Staging deployment set up'
           fi
