@@ -10,7 +10,6 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   REACT_APP_DEPLOY_TARGET: staging
-  REACT_APP_COMMIT_HASH: ''
   DISTRIBUTION_ID: E3EKR8AT21U2R4
   VERSION: ''
   S3_BUCKET: longevize-mylongevize-staging
@@ -27,7 +26,7 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - name: Determine + setup production env
+      - name: Determine + setup env
         run: |
           VERSION=$(npm run env | grep npm_package_version | cut -d '=' -f 2)
           # Override VERSION in tagged commits.
@@ -39,11 +38,22 @@ jobs:
             echo "S3_BUCKET=longevize-mylongevize" >> $GITHUB_ENV
             echo "DISTRIBUTION_ID=E3LVG11EB856GB" >> $GITHUB_ENV
             echo 'Production deployment set up'
-          else 
-            echo "REACT_APP_COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          fi
+          if ${{ github.ref_name == 'main' }};
+          then
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_DEVELOPMENT }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEVELOPMENT }}" >> $GITHUB_ENV
+            echo "REACT_APP_DEPLOY_TARGET=development" >> $GITHUB_ENV
+            echo "S3_BUCKET=s3-633551029463-frontend-web-application" >> $GITHUB_ENV
+            echo "DISTRIBUTION_ID=E25BGCKZ416RLA" >> $GITHUB_ENV
+            echo 'Development deployment set up'
+          fi
+          if [[ ${{ github.ref_name  }} =~ ^releases\/.*.*$ ]];
+          then
+            echo 'Staging deployment set up'
           fi
           echo ${{ github.ref_name }}
-          echo "$DISTRIBUTION_ID"
+          echo "$REACT_APP_DEPLOY_TARGET"
       # - name: Restore npm cache
       #   uses: actions/cache@v3
       #   with:
@@ -55,23 +65,19 @@ jobs:
       #   run: npm ci --no-audit
       # - name: Build application
       #   run: npm run build
-      # # DEVELOPMENT: AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_DEVELOPMENT }}
-      # # DEVELOPMENT: AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEVELOPMENT }}
+
       # - name: AWS authentication
       #   uses: aws-actions/configure-aws-credentials@v1
       #   with:
       #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
       #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}         
       #     aws-region: eu-central-1
-      # # DEVELOPMENT: S3_BUCKET: s3-633551029463-frontend-web-application
       # - name: Clean bucket
       #   run: aws s3 rm s3://${{ env.S3_BUCKET }} --recursive    
       # - name: Copy to bucket
       #   run: aws s3 cp ./build s3://${{ env.S3_BUCKET }} --recursive 
-      # # DEVELOPMENT: DISTRIBUTION_ID:  E25BGCKZ416RLA
       # - name: Invalidate cloudfront cache
       #   run: aws cloudfront create-invalidation --distribution-id ${{ env.DISTRIBUTION_ID }} --paths /\*
-      # # DEVELOPMENT: REACT_APP_DEPLOY_TARGET: development
       # - name: Create Sentry release
       #   uses: getsentry/action-release@v1
       #   if: ${{ env.REACT_APP_DEPLOY_TARGET == 'production' }}
