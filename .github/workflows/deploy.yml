@@ -42,46 +42,47 @@ jobs:
           else 
             echo "REACT_APP_COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           fi
-          echo ${GITHUB_BASE_REF}
+          echo ${GITHUB_REF}
           echo "$AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY ..."
-      - name: Restore npm cache
-        uses: actions/cache@v3
-        with:
-          path: '~/.npm'
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Install packages
-        run: npm ci --no-audit
-      - name: Build application
-        run: npm run build
-      # DEVELOPMENT: AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_DEVELOPMENT }}
-      # DEVELOPMENT: AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEVELOPMENT }}
-      - name: AWS authentication
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}         
-          aws-region: eu-central-1
-      # DEVELOPMENT: S3_BUCKET: s3-633551029463-frontend-web-application
-      - name: Clean bucket
-        run: aws s3 rm s3://${{ env.S3_BUCKET }} --recursive    
-      - name: Copy to bucket
-        run: aws s3 cp ./build s3://${{ env.S3_BUCKET }} --recursive 
-      # DEVELOPMENT: DISTRIBUTION_ID:  E25BGCKZ416RLA
-      - name: Invalidate cloudfront cache
-        run: aws cloudfront create-invalidation --distribution-id ${{ env.DISTRIBUTION_ID }} --paths /\*
-      # DEVELOPMENT: REACT_APP_DEPLOY_TARGET: development
-      - name: Create Sentry release
-        uses: getsentry/action-release@v1
-        if: ${{ env.REACT_APP_DEPLOY_TARGET == 'production' }}
+          echo "$DISTRIBUTION_ID"
+      # - name: Restore npm cache
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: '~/.npm'
+      #     key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-node-
+      # - name: Install packages
+      #   run: npm ci --no-audit
+      # - name: Build application
+      #   run: npm run build
+      # # DEVELOPMENT: AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_DEVELOPMENT }}
+      # # DEVELOPMENT: AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEVELOPMENT }}
+      # - name: AWS authentication
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}         
+      #     aws-region: eu-central-1
+      # # DEVELOPMENT: S3_BUCKET: s3-633551029463-frontend-web-application
+      # - name: Clean bucket
+      #   run: aws s3 rm s3://${{ env.S3_BUCKET }} --recursive    
+      # - name: Copy to bucket
+      #   run: aws s3 cp ./build s3://${{ env.S3_BUCKET }} --recursive 
+      # # DEVELOPMENT: DISTRIBUTION_ID:  E25BGCKZ416RLA
+      # - name: Invalidate cloudfront cache
+      #   run: aws cloudfront create-invalidation --distribution-id ${{ env.DISTRIBUTION_ID }} --paths /\*
+      # # DEVELOPMENT: REACT_APP_DEPLOY_TARGET: development
+      # - name: Create Sentry release
+      #   uses: getsentry/action-release@v1
+      #   if: ${{ env.REACT_APP_DEPLOY_TARGET == 'production' }}
         
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: longevize-bv
-          SENTRY_PROJECT: longevize-pwa
-        with:
-          environment: ${{ env.REACT_APP_DEPLOY_TARGET }}
-          version: ${{ env.VERSION }}
-          sourcemaps: ./build/static/js/ ./build/static/css/
-          set_commits: skip
+      #   env:
+      #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      #     SENTRY_ORG: longevize-bv
+      #     SENTRY_PROJECT: longevize-pwa
+      #   with:
+      #     environment: ${{ env.REACT_APP_DEPLOY_TARGET }}
+      #     version: ${{ env.VERSION }}
+      #     sourcemaps: ./build/static/js/ ./build/static/css/
+      #     set_commits: skip
